@@ -202,22 +202,22 @@ Get-ChildItem -Force -File -Recurse * | ForEach-Object {
             if ($_ -isnot [System.IO.DirectoryInfo]) {
                 ( Get-Content $a ) |
                 ForEach-Object {
-                    $_ -replace "cidus",$projectName
+                    $_ -replace "__change__",$projectName
                 } | Set-Content $a
 
                 ( Get-Content $a ) |
                 ForEach-Object {
-                    $_ -replace "cidus",$containerName
+                    $_ -replace "__container__",$containerName
                 } | Set-Content $a
 
                 ( Get-Content $a ) |
                 ForEach-Object {
-                    $_ -replace "/home/castello",$env:HOME
+                    $_ -replace "__home__",$env:HOME
                 } | Set-Content $a
                 
                 ( Get-Content $a ) |
                 ForEach-Object {
-                    $_ -replace "python3Console", $templateName
+                    $_ -replace "__templateFolder__", $templateName
                 } | Set-Content $a
             }
         } elseif (-not $a.Contains("id_rsa.pub")) {
@@ -289,7 +289,9 @@ for ($i = 0; $i -lt $updateTable.Count; $i++) {
     $_target = (Invoke-Expression "echo `"$_target`"")
 
     # check if the file exists, if not simple copy it
-    if (Test-Path $projectFolder/$_target -eq $True) {
+    if (
+        (Test-Path $projectFolder/$_target) -eq $True
+    ) {
         _openMergeWindow `
             $projectFolder/.conf/tmp/$_source `
             $projectFolder/$_target
