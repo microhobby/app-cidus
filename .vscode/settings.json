@@ -20,7 +20,7 @@
   },
   "docker_registry": "matheuscastello",
   "docker_password": "secret",
-  "docker_tag": "v1",
+  "docker_tag": "v2",
   "tcb.clientId": "api-v2_85d78db0_0ec8aebf-fa7c-49d0-95f3-89c7178ba1c1",
   "tcb.clientSecret": "secret",
   "tcb.fleetName": "void",

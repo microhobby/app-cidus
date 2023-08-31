@@ -3,7 +3,8 @@
     "tasks": [
         {
             "label": "deploy-torizon-arm",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "scp",
             "type": "process",
             "args": [
@@ -28,7 +29,8 @@
         },
         {
             "label": "wait-debugpy-start-arm",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sleep",
             "type": "process",
             "args": [
@@ -58,7 +60,8 @@
         },
         {
             "label": "start-torizon-debug-arm",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "ssh",
             "type": "process",
             "args": [
@@ -82,7 +85,8 @@
         },
         {
             "label": "deploy-torizon-arm64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "scp",
             "type": "process",
             "args": [
@@ -107,7 +111,8 @@
         },
         {
             "label": "wait-debugpy-start-arm64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sleep",
             "type": "process",
             "args": [
@@ -137,7 +142,8 @@
         },
         {
             "label": "start-torizon-debug-arm64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "ssh",
             "type": "process",
             "args": [
@@ -161,7 +167,8 @@
         },
         {
             "label": "host-install-pip-requirements",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "${command:python.interpreterPath}",
             "type": "process",
             "args": [
@@ -177,35 +184,29 @@
             "icon": {
                 "id": "layers",
                 "color": "terminal.ansiCyan"
-            }
+            },
+            "dependsOn": [
+                "host-upgrade-pip"
+            ]
         },
         {
-            "label": ".🔃-try-update-template",
-            "command": "echo",
-            "type": "process",
-            "presentation": {
-                "echo": false,
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
+            "label": "host-upgrade-pip",
+            "detail": "",
+            "hide": true,
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}"
             },
-            "args": [
-                "▶️ merge task finished"
-            ],
+            "command": "[ $(${command:python.interpreterPath} -m pip --version | awk '{print $2}' | cut -d'.' -f1) -lt 23 ] && ${command:python.interpreterPath} -m pip install --upgrade pip || true",
             "dependsOrder": "sequence",
-            "dependsOn": [
-                "try-update-template"
-            ],
             "icon": {
-                "id": "repo-sync",
-                "color": "terminal.ansiCyan"
+                "id": "flame",
+                "color": "terminal.ansiYellow"
             }
         },
         {
             "label": "try-update-template",
-            "detail": "hide",
+            "detail": "This task has automation steps to update the project\nbased on the template used to create it.",
             "command": "pwsh",
             "type": "process",
             "presentation": {
@@ -222,7 +223,8 @@
             "args": [
                 "${workspaceFolder}/.conf/projectUpdater.ps1",
                 "${workspaceFolder}",
-                "${workspaceFolderBasename}"
+                "${workspaceFolderBasename}",
+                "0"
             ],
             "dependsOrder": "sequence",
             "icon": {
@@ -231,8 +233,9 @@
             }
         },
         {
-            "label": ".🔨-create-production-image",
-            "command": "echo",
+            "label": "try-update-template-accepting-all",
+            "detail": "This task has automation steps to update the project\nbased on the template used to create it.",
+            "command": "pwsh",
             "type": "process",
             "presentation": {
                 "echo": false,
@@ -240,24 +243,26 @@
                 "focus": true,
                 "panel": "shared",
                 "showReuseMessage": true,
-                "clear": false,
-                "group": "create-prod-image"
+                "clear": false
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
             },
             "args": [
-                "▶️ Create Production Image task Finished"
+                "${workspaceFolder}/.conf/projectUpdater.ps1",
+                "${workspaceFolder}",
+                "${workspaceFolderBasename}",
+                "1"
             ],
             "dependsOrder": "sequence",
-            "dependsOn": [
-                "create-production-image"
-            ],
             "icon": {
-                "id": "layers",
+                "id": "repo-sync",
                 "color": "terminal.ansiCyan"
             }
         },
         {
             "label": "create-production-image",
-            "detail": "hide",
+            "detail": "This task has automation steps to build the production\nDocker image. The production Docker image\nis based in the Dockerfile file.",
             "command": "pwsh",
             "type": "process",
             "presentation": {
@@ -285,13 +290,14 @@
             ],
             "dependsOrder": "sequence",
             "icon": {
-                "id": "layers",
+                "id": "package",
                 "color": "terminal.ansiCyan"
             }
         },
         {
             "label": "set-platform-fleet-name",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "DOCKER_HOST=",
             "type": "shell",
             "options": {
@@ -314,7 +320,7 @@
         },
         {
             "label": "fill-pipeline-settings",
-            "detail": "",
+            "detail": "This task will fill the properties that are needed to be\nset in the .vscode/settings.json to correctly\nrun the GitHub Actions or GitLab CI pipelines.",
             "command": "echo",
             "type": "shell",
             "options": {
@@ -352,7 +358,7 @@
                 "$tsc"
             ],
             "icon": {
-                "id": "flame",
+                "id": "notebook-edit",
                 "color": "terminal.ansiYellow"
             },
             "dependsOrder": "sequence",
@@ -360,7 +366,7 @@
         },
         {
             "label": "platform-update-fleet",
-            "detail": "",
+            "detail": "This task will trigger the update of the fleet in the\nTorizon Platform with the latest version\nof the application published to the platform.",
             "command": "DOCKER_HOST=",
             "type": "shell",
             "options": {
@@ -383,7 +389,7 @@
                 "$tsc"
             ],
             "icon": {
-                "id": "flame",
+                "id": "cloud-upload",
                 "color": "terminal.ansiYellow"
             },
             "dependsOrder": "sequence",
@@ -391,7 +397,7 @@
         },
         {
             "label": "tcb-platform-publish",
-            "detail": "",
+            "detail": "This task will build the production image based on the\nDockerfile and push it to the Torizon\nPlatform creating a new docker-compose package.",
             "command": "DOCKER_HOST=",
             "type": "shell",
             "options": {
@@ -399,7 +405,7 @@
                 "env": {
                     "DOCKER_PSSWD": "${command:docker_password}",
                     "DOCKER_LOGIN": "${command:docker_login}",
-                    "VSCODE_CMD": "--verbose platform push --credentials credentials.zip --package-name cidus --package-version ${command:tcb.getNextPackageVersion} --login ${env:DOCKER_LOGIN} ${env:DOCKER_PSSWD} --canonicalize docker-compose.prod.yml"
+                    "VSCODE_CMD": "--verbose platform push --credentials credentials.zip --package-name cidus --package-version ${command:tcb.getNextPackageVersion} --login $DOCKER_LOGIN $DOCKER_PSSWD --canonicalize docker-compose.prod.yml"
                 }
             },
             "args": [
@@ -414,7 +420,7 @@
                 "$tsc"
             ],
             "icon": {
-                "id": "flame",
+                "id": "cloud-upload",
                 "color": "terminal.ansiYellow"
             },
             "dependsOrder": "sequence",
@@ -424,7 +430,8 @@
         },
         {
             "label": "docker-login",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "DOCKER_HOST=",
             "type": "shell",
             "options": {
@@ -455,7 +462,8 @@
         },
         {
             "label": "run-docker-registry",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "pwsh",
             "type": "process",
             "presentation": {
@@ -485,7 +493,8 @@
         },
         {
             "label": "run-docker-registry-wsl",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "pwsh",
             "type": "process",
             "presentation": {
@@ -516,7 +525,8 @@
         },
         {
             "label": "run-torizon-binfmt",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "pwsh",
             "type": "process",
             "presentation": {
@@ -544,7 +554,8 @@
         },
         {
             "label": "run-share-wsl-ports",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "pwsh",
             "type": "process",
             "presentation": {
@@ -567,6 +578,7 @@
         },
         {
             "label": "check-deps",
+            "detail": "This task will check if the dependencies needed to run\nthe project are installed in the host machine.",
             "command": "pwsh",
             "type": "process",
             "presentation": {
@@ -588,7 +600,8 @@
         },
         {
             "label": "apply-torizon-packages",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "pwsh",
             "type": "process",
             "presentation": {
@@ -611,7 +624,8 @@
         },
         {
             "label": "copy-docker-compose",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sshpass",
             "type": "process",
             "args": [
@@ -637,7 +651,8 @@
         },
         {
             "label": "wait-a-bit",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sleep",
             "type": "process",
             "args": [
@@ -652,7 +667,8 @@
         },
         {
             "label": "pos-cleanup",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "ssh",
             "type": "process",
             "args": [
@@ -676,7 +692,8 @@
         },
         {
             "label": "validate-settings",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "bash",
             "type": "process",
             "args": [
@@ -695,7 +712,8 @@
         },
         {
             "label": "validate-arch-amd64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "bash",
             "type": "process",
             "args": [
@@ -711,7 +729,8 @@
         },
         {
             "label": "validate-arch-arm",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "bash",
             "type": "process",
             "args": [
@@ -727,7 +746,8 @@
         },
         {
             "label": "validate-arch-arm64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "bash",
             "type": "process",
             "args": [
@@ -743,7 +763,8 @@
         },
         {
             "label": "validate-arch-riscv64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "bash",
             "type": "process",
             "args": [
@@ -759,7 +780,8 @@
         },
         {
             "label": "pre-cleanup-arm64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sshpass",
             "type": "process",
             "args": [
@@ -785,7 +807,8 @@
         },
         {
             "label": "pre-cleanup-arm",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sshpass",
             "type": "process",
             "args": [
@@ -811,7 +834,8 @@
         },
         {
             "label": "pre-cleanup-amd64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sshpass",
             "type": "process",
             "args": [
@@ -837,7 +861,8 @@
         },
         {
             "label": "pre-cleanup-riscv64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sshpass",
             "type": "process",
             "args": [
@@ -863,7 +888,8 @@
         },
         {
             "label": "build-container-torizon-debug-arm64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "DOCKER_HOST=",
             "type": "shell",
             "options": {
@@ -901,7 +927,8 @@
         },
         {
             "label": "build-container-torizon-debug-arm",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "DOCKER_HOST=",
             "type": "shell",
             "options": {
@@ -939,7 +966,8 @@
         },
         {
             "label": "build-container-torizon-debug-amd64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "DOCKER_HOST=",
             "type": "shell",
             "options": {
@@ -977,7 +1005,8 @@
         },
         {
             "label": "build-container-torizon-debug-riscv64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "DOCKER_HOST=",
             "type": "shell",
             "options": {
@@ -1015,6 +1044,8 @@
         },
         {
             "label": "build-container-image-sdk-arm64",
+            "detail": "",
+            "hide": true,
             "command": "DOCKER_HOST=",
             "type": "shell",
             "args": [
@@ -1039,6 +1070,8 @@
         },
         {
             "label": "build-container-image-sdk-arm",
+            "detail": "",
+            "hide": true,
             "command": "DOCKER_HOST=",
             "type": "shell",
             "args": [
@@ -1063,6 +1096,8 @@
         },
         {
             "label": "build-container-image-sdk-amd64",
+            "detail": "",
+            "hide": true,
             "command": "DOCKER_HOST=",
             "type": "shell",
             "args": [
@@ -1087,6 +1122,8 @@
         },
         {
             "label": "build-container-image-sdk-riscv64",
+            "detail": "",
+            "hide": true,
             "command": "DOCKER_HOST=",
             "type": "shell",
             "args": [
@@ -1111,7 +1148,8 @@
         },
         {
             "label": "push-container-torizon-debug-arm",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "DOCKER_HOST=",
             "type": "shell",
             "options": {
@@ -1135,7 +1173,8 @@
         },
         {
             "label": "push-container-torizon-debug-arm64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "DOCKER_HOST=",
             "type": "shell",
             "options": {
@@ -1159,7 +1198,8 @@
         },
         {
             "label": "push-container-torizon-debug-amd64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "DOCKER_HOST=",
             "type": "shell",
             "options": {
@@ -1183,7 +1223,8 @@
         },
         {
             "label": "push-container-torizon-debug-riscv64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "DOCKER_HOST=",
             "type": "shell",
             "options": {
@@ -1207,7 +1248,8 @@
         },
         {
             "label": "pull-container-torizon-debug-arm64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sshpass",
             "type": "process",
             "args": [
@@ -1233,7 +1275,8 @@
         },
         {
             "label": "pull-container-torizon-debug-arm",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sshpass",
             "type": "process",
             "args": [
@@ -1259,7 +1302,8 @@
         },
         {
             "label": "pull-container-torizon-debug-amd64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sshpass",
             "type": "process",
             "args": [
@@ -1285,7 +1329,8 @@
         },
         {
             "label": "pull-container-torizon-debug-amd64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sshpass",
             "type": "process",
             "args": [
@@ -1311,7 +1356,8 @@
         },
         {
             "label": "pull-container-torizon-debug-riscv64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sshpass",
             "type": "process",
             "args": [
@@ -1337,7 +1383,8 @@
         },
         {
             "label": "run-container-torizon-debug-arm64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sshpass",
             "type": "process",
             "args": [
@@ -1363,7 +1410,8 @@
         },
         {
             "label": "run-container-torizon-debug-arm",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sshpass",
             "type": "process",
             "args": [
@@ -1389,7 +1437,8 @@
         },
         {
             "label": "run-container-torizon-debug-amd64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sshpass",
             "type": "process",
             "args": [
@@ -1415,7 +1464,8 @@
         },
         {
             "label": "run-container-torizon-debug-amd64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sshpass",
             "type": "process",
             "args": [
@@ -1441,7 +1491,8 @@
         },
         {
             "label": "run-container-torizon-debug-riscv64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "sshpass",
             "type": "process",
             "args": [
@@ -1467,6 +1518,7 @@
         },
         {
             "label": "push-release-arm",
+            "detail": "This task will build the application based in the\nproduction Dockerfile and push the image to DockerHub.",
             "command": "DOCKER_HOST=",
             "type": "shell",
             "options": {
@@ -1488,12 +1540,13 @@
             "dependsOrder": "sequence",
             "problemMatcher": "$msCompile",
             "icon": {
-                "id": "flame",
+                "id": "repo-push",
                 "color": "terminal.ansiYellow"
             }
         },
         {
             "label": "push-release-arm64",
+            "detail": "This task will build the application based in the\nproduction Dockerfile and push the image to DockerHub.",
             "command": "DOCKER_HOST=",
             "type": "shell",
             "options": {
@@ -1515,12 +1568,13 @@
             "dependsOrder": "sequence",
             "problemMatcher": "$msCompile",
             "icon": {
-                "id": "flame",
+                "id": "repo-push",
                 "color": "terminal.ansiYellow"
             }
         },
         {
             "label": "push-release-amd64",
+            "detail": "This task will build the application based in the\nproduction Dockerfile and push the image to DockerHub.",
             "command": "DOCKER_HOST=",
             "type": "shell",
             "options": {
@@ -1542,13 +1596,14 @@
             "dependsOrder": "sequence",
             "problemMatcher": "$msCompile",
             "icon": {
-                "id": "flame",
+                "id": "repo-push",
                 "color": "terminal.ansiYellow"
             }
         },
         {
             "label": "build-release-arm",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "DOCKER_HOST=",
             "type": "shell",
             "options": {
@@ -1574,7 +1629,8 @@
         },
         {
             "label": "build-release-arm64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "DOCKER_HOST=",
             "type": "shell",
             "options": {
@@ -1600,7 +1656,8 @@
         },
         {
             "label": "build-release-amd64",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "DOCKER_HOST=",
             "type": "process",
             "options": {
@@ -1626,6 +1683,7 @@
         },
         {
             "label": "show-project-documentation",
+            "detail": "This task will open the project specific documentation\nin a new tab.",
             "command": "${command:markdown.showPreview}",
             "type": "process",
             "presentation": {
@@ -1644,14 +1702,15 @@
             "dependsOrder": "sequence",
             "problemMatcher": "$msCompile",
             "icon": {
-                "id": "flame",
+                "id": "book",
                 "color": "terminal.ansiYellow"
             }
         },
         {
             "label": "open-project-documentation-file",
             "command": "code",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "type": "process",
             "presentation": {
                 "echo": false,
@@ -1674,7 +1733,8 @@
         {
             "label": "wget-documentation-file",
             "command": "wget",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "type": "process",
             "args": [
                 "-O",
@@ -1690,7 +1750,8 @@
         },
         {
             "label": "validate-pipeline-settings",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "pwsh",
             "type": "process",
             "options": {
@@ -1721,7 +1782,8 @@
         },
         {
             "label": "validate-deps-running",
-            "detail": "hide",
+            "detail": "",
+            "hide": true,
             "command": "pwsh",
             "type": "process",
             "options": {
